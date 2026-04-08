@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="auth.js"></script>
+<title>Product — The Arabic Market</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { min-height: 100vh; }
+body { display: flex; flex-direction: column; }
+main { flex: 1; }
+:root {
+  --bg: #fafaf8;
+  --white: #ffffff;
+  --black: #0a0a0a;
+  --gray-100: #f5f5f3;
+  --gray-200: #e8e8e4;
+  --gray-300: #d0d0cc;
+  --gray-400: #999;
+  --gray-500: #666;
+  --accent: #c8510b;
+  --font: 'Space Grotesk', sans-serif;
+  --body: 'Inter', sans-serif;
+}
+[data-theme="dark"] {
+  --bg: #0a0a0a; --white: #141414; --black: #f0f0f0;
+  --gray-100: #1a1a1a; --gray-200: #2a2a2a; --gray-300: #3a3a3a;
+  --gray-400: #888; --gray-500: #aaa;
+}
+[data-theme="dark"] .nav { background: rgba(10,10,10,0.95); border-color: #222; }
+[data-theme="dark"] .nav-logo img { filter: brightness(0) invert(1); }
+[data-theme="dark"] .product-images { background: #2a2a2a; }
+[data-theme="dark"] .product-images img { background: #2a2a2a; filter: brightness(0.82); }
+[data-theme="dark"] .site-footer { background: #141414; }
+[data-theme="dark"] .footer-logo img { filter: brightness(0) invert(1); }
+[data-theme="dark"] .toast { background: #f0f0f0; color: #0a0a0a; }
+[data-theme="dark"] .btn-add-cart { background: #f0f0f0; color: #0a0a0a; }
+[data-theme="dark"] .btn-add-cart:hover { background: #ddd; }
+[data-theme="dark"] .size-btn { color: #f0f0f0; border-color: #3a3a3a; }
+[data-theme="dark"] .size-btn:hover { border-color: #888; }
+[data-theme="dark"] .size-btn.active { background: #f0f0f0; color: #0a0a0a; border-color: #f0f0f0; }
+[data-theme="dark"] .size-label { color: #f0f0f0; }
+[data-theme="dark"] .breadcrumb { color: #888; }
+[data-theme="dark"] .breadcrumb span { color: #aaa; }
+.theme-toggle {
+  color: var(--black); cursor: pointer; display: flex; align-items: center;
+  background: none; border: none; padding: 0;
+}
+.theme-toggle svg { width: 20px; height: 20px; }
+.theme-toggle .icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+body { background: var(--bg); color: var(--black); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+::selection { background: var(--black); color: var(--white); }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+.sar { display: inline-block; width: 1em; height: 1em; background: url('images/sar.svg') no-repeat center/contain; vertical-align: -0.1em; }
+[data-theme="dark"] .sar { filter: brightness(0) invert(1); }
+
+/* ─── NAV ─── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250,250,248,0.95);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--gray-200);
+}
+.nav-inner {
+  padding: 0 2rem; height: 80px;
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.nav-links { display: flex; gap: 2rem; align-items: center; }
+.nav-links a {
+  font-size: 0.8rem; font-weight: 500; color: var(--gray-500);
+  letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--black); }
+.nav-logo {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font); font-weight: 700; font-size: 1.1rem;
+  justify-self: center;
+}
+.nav-logo img { height: 70px; width: auto; filter: brightness(0); }
+.nav-right {
+  display: flex; gap: 1.2rem; align-items: center; justify-self: end;
+}
+.nav-right a, .nav-cart { color: var(--black); display: flex; align-items: center; cursor: pointer; }
+.nav-right svg { width: 20px; height: 20px; }
+.nav-cart { position: relative; }
+.cart-count {
+  background: var(--accent); color: var(--white);
+  font-size: 0.55rem; font-weight: 700;
+  width: 15px; height: 15px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: absolute; top: -5px; right: -8px;
+}
+.lang-btn {
+  background: none; border: 1px solid rgba(0,0,0,0.3);
+  color: var(--black); cursor: pointer;
+  font-family: var(--font); font-size: 0.7rem; font-weight: 600;
+  padding: 0.3rem 0.6rem; border-radius: 4px;
+  letter-spacing: 0.03em; transition: all 0.2s;
+}
+.lang-btn:hover { background: rgba(0,0,0,0.1); }
+.nav-user {
+  color: var(--black); cursor: pointer;
+  display: flex; align-items: center;
+}
+.nav-user svg { width: 20px; height: 20px; }
+[dir="rtl"] .nav-links { direction: rtl; }
+
+/* ─── BREADCRUMB ─── */
+.breadcrumb {
+  padding: 1rem 2rem;
+  font-size: 0.7rem; color: var(--gray-400);
+}
+.breadcrumb a { transition: color 0.2s; }
+.breadcrumb a:hover { color: var(--black); }
+.breadcrumb span { color: var(--gray-500); }
+
+/* ─── PRODUCT LAYOUT (Scuffers-style 3 columns) ─── */
+.product-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.2fr;
+  gap: 0;
+  min-height: calc(100vh - 100px);
+}
+
+/* LEFT: Product details */
+.product-details {
+  padding: 1.5rem 1.5rem 1.5rem 2.5rem;
+  position: sticky; top: 80px;
+  align-self: start;
+}
+.product-title {
+  font-family: var(--font);
+  font-size: 1.3rem; font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem; line-height: 1.25;
+}
+.product-price {
+  font-size: 0.95rem; font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+.detail-toggle {
+  font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--black);
+  cursor: pointer; background: none; border: none;
+  padding: 0; margin-bottom: 0.8rem;
+  display: flex; align-items: center; gap: 0.4rem;
+  font-family: var(--font);
+}
+.detail-toggle svg { width: 12px; height: 12px; transition: transform 0.3s; }
+.detail-toggle.open svg { transform: rotate(180deg); }
+.product-desc {
+  font-size: 0.8rem; line-height: 1.7;
+  color: var(--gray-500);
+  margin-bottom: 1.5rem;
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.product-desc.show { max-height: 300px; }
+.detail-section {
+  border-top: 1px solid var(--gray-200);
+  padding-top: 1rem; margin-top: 0.5rem;
+}
+.detail-item-header {
+  font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--black);
+  cursor: pointer; padding: 0.6rem 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font);
+}
+.detail-item-header svg { width: 12px; height: 12px; transition: transform 0.3s; }
+.detail-item-body {
+  font-size: 0.78rem; line-height: 1.7; color: var(--gray-500);
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+}
+.detail-item.open .detail-item-header svg { transform: rotate(45deg); }
+.detail-item.open .detail-item-body { max-height: 150px; padding-bottom: 0.8rem; }
+
+/* CENTER: Scrolling images */
+.product-images {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 0;
+  background: var(--gray-100);
+}
+.product-images img {
+  width: 100%;
+  object-fit: contain;
+  background: var(--gray-100);
+}
+
+/* Thumbnails on left side of images */
+.product-thumbs {
+  position: absolute; left: 0.5rem; top: 50%;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 0.5rem;
+  z-index: 2;
+}
+.product-thumb {
+  width: 44px; height: 44px;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  cursor: pointer; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.product-thumb.active { border-color: var(--black); }
+.product-thumb img { width: 100%; height: 100%; object-fit: contain; }
+
+/* Image dots (mobile) */
+.image-dots {
+  display: none;
+  justify-content: center; gap: 0.4rem;
+  padding: 0.8rem 0;
+}
+.image-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gray-300);
+  transition: background 0.2s;
+}
+.image-dot.active { background: var(--black); }
+
+/* RIGHT: Size & Add to Cart (sticky) */
+.product-actions {
+  padding: 1.5rem 2.5rem 1.5rem 1.5rem;
+  position: sticky; top: 80px;
+  align-self: start;
+}
+.size-label {
+  font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  margin-bottom: 0.8rem;
+  display: flex; gap: 0.5rem;
+}
+.size-label span { font-weight: 400; color: var(--gray-400); }
+.size-grid {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.size-btn {
+  min-width: 44px; height: 44px; padding: 0 0.8rem;
+  border: 1.5px solid var(--gray-200); border-radius: 50px;
+  background: transparent;
+  font-family: var(--font); font-size: 0.8rem; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+  text-align: center;
+}
+.size-btn:hover { border-color: var(--gray-400); }
+.size-btn.active {
+  background: var(--black); color: var(--white); border-color: var(--black);
+}
+.buy-section { margin-top: 0.5rem; }
+.availability {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.75rem; color: var(--gray-500);
+  margin-bottom: 0.8rem;
+}
+.availability .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #22c55e;
+}
+.btn-add-cart {
+  width: 100%; padding: 0.9rem 1.2rem;
+  background: var(--black); color: var(--white);
+  font-family: var(--font); font-size: 0.85rem; font-weight: 500;
+  border: none; cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.btn-add-cart:hover { background: #222; }
+.shipping-note {
+  font-size: 0.7rem; color: var(--gray-400);
+  margin-top: 1rem; line-height: 1.6;
+}
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 300;
+  background: var(--black); color: #fff;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.8rem; font-weight: 500;
+  display: flex; align-items: center; gap: 0.5rem;
+  transform: translateY(80px); opacity: 0;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast svg { width: 16px; height: 16px; color: #4ade80; flex-shrink: 0; }
+
+/* ─── FOOTER ─── */
+.site-footer {
+  background: var(--black); color: var(--white);
+  padding: 2rem; margin-top: 3rem;
+}
+.footer-inner {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-logo { display: inline-block; }
+.footer-logo img { height: 50px; width: auto; filter: brightness(0) invert(1); opacity: 0.35; }
+.footer-right { font-size: 0.7rem; color: rgba(255,255,255,0.25); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .product-layout {
+    grid-template-columns: 1fr;
+  }
+  .product-details, .product-actions {
+    position: static;
+    padding: 1rem 1.5rem;
+  }
+  .product-images { order: 1; padding: 0; }
+  .product-images img:not(:first-child) { display: none; }
+  .image-dots { display: flex; }
+  .product-details { order: 2; display: none; }
+  .product-actions { order: 3; }
+  /* Mobile: show name+price above sizes */
+  .mobile-header { display: block !important; }
+  .breadcrumb { display: none; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-inner { grid-template-columns: auto 1fr auto; height: 60px; padding: 0 1rem; }
+  .nav-logo { justify-self: center; }
+  .nav-logo img { height: 40px; }
+  .nav-right { gap: 0.8rem; }
+  .nav-right svg { width: 18px; height: 18px; }
+  .lang-btn { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
+  .btn-add-cart {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    z-index: 50; padding: 1rem 1.5rem;
+  }
+  .product-actions { padding-bottom: 5rem; }
+}
+</style>
+<link rel="stylesheet" href="cart.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-links">
+      <a href="store.html?collection=sudan">Republic of Sudan</a>
+      <a href="store.html?collection=mad-scientist">The Mad Scientist</a>
+    </div>
+    <a href="index.html" class="nav-logo">
+      <img src="images/logo.svg" alt="The Arabic Market">
+    </a>
+    <div class="nav-right">
+      <button class="lang-btn" onclick="Lang.toggle(); location.reload();" aria-label="Switch language">
+        <span class="lang-btn-text">عربي</span>
+      </button>
+      <a href="account.html" class="nav-user" aria-label="Account">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+      </a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>
+      </button>
+      <a href="store.html">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+      </a>
+      <div class="nav-cart" onclick="Cart.open()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
+        <span class="cart-count">0</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="index.html">Home</a> / <a href="#" id="colLink">Collection</a> / <span id="prodBreadcrumb">Product</span>
+</div>
+
+<main>
+<!-- PRODUCT LAYOUT -->
+<div class="product-layout" id="productLayout">
+  <!-- LEFT: Details -->
+  <div class="product-details">
+    <h1 class="product-title" id="prodTitle"></h1>
+    <div class="product-price" id="prodPrice"></div>
+
+    <button class="detail-toggle" id="detailToggle" onclick="toggleDesc()">
+      DETAILS
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+    </button>
+    <p class="product-desc" id="prodDesc"></p>
+
+    <div class="detail-section">
+      <div class="detail-item">
+        <div class="detail-item-header" onclick="this.parentElement.classList.toggle('open')">
+          SHIPPING
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        </div>
+        <div class="detail-item-body">Free shipping on orders over $100. Standard delivery 5–7 business days.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-header" onclick="this.parentElement.classList.toggle('open')">
+          SIZE GUIDE
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        </div>
+        <div class="detail-item-body">Model wearing size M. Height 180cm. Oversized fit — we recommend your regular size.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: Images -->
+  <div class="product-images" id="productImages"></div>
+
+  <!-- RIGHT: Sizes & Buy -->
+  <div class="product-actions">
+    <div class="mobile-header" style="display:none;">
+      <h2 style="font-family:var(--font);font-size:1.1rem;font-weight:600;margin-bottom:0.2rem;" id="mobileTitle"></h2>
+      <div style="font-size:0.9rem;margin-bottom:1.2rem;" id="mobilePrice"></div>
+    </div>
+    <div class="size-label">Size <span id="sizeSelected"></span></div>
+    <div class="size-grid" id="sizeGrid"></div>
+    <div class="buy-section">
+      <div class="availability">
+        <span class="dot"></span> Buy now
+      </div>
+      <button class="btn-add-cart" onclick="addToCart()"><span>Add to Cart</span><span id="btnPrice"></span></button>
+      <p class="shipping-note">Worldwide shipping available. Hassle-free returns. Premium quality guaranteed.</p>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a href="index.html" class="footer-logo"><img src="images/logo.svg" alt="The Arabic Market"></a>
+    <div class="footer-right">&copy; 2025 Designed in Sudan</div>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+  <span id="toastText">Added to cart!</span>
+</div>
+
+<script src="lang.js"></script>
+<script>
+const FALLBACK = {"site":{"name":"The Arabic Market"},"collections":[{"id":"sudan","tag":"Collection 01","name":"Republic of Sudan"},{"id":"mad-scientist","tag":"Collection 02","name":"The Mad Scientist"}],"products":[{"id":"p1","collection":"sudan","name":"Sudan Statement Hoodie","price":85,"image":"images/hoodie-model.jpg","images":["images/hoodie-sudan.png","images/typography-sudan.png","images/hoodie-model.jpg"],"sizes":["S","M","L","XL","XXL"],"darkBg":false,"status":"available","desc":"Premium heavyweight hoodie featuring embroidered 'Republic of Sudan' typography. Oversized fit, brushed fleece interior."},{"id":"p2","collection":"sudan","name":"Heritage Emblem Cap","price":35,"image":"images/cap-model.jpg","images":["images/cap-angle.png","images/cap-front.png","images/cap-model.jpg"],"sizes":["One Size"],"darkBg":false,"status":"available","desc":"Washed cotton dad cap with embroidered eagle emblem. Adjustable brass buckle closure."},{"id":"p3","collection":"sudan","name":"Republic Tee","price":55,"image":"images/sweatshirt.jpg","images":["images/typography-sudan.png","images/badge-logo.png","images/sweatshirt.jpg"],"sizes":["S","M","L","XL","XXL"],"darkBg":false,"status":"available","desc":"Oversized heavyweight tee with back print Arabic script. 100% cotton, pre-shrunk."},{"id":"p4","collection":"sudan","name":"Heritage Ice Cap","price":28,"image":"images/icecap-model.jpg","images":["images/beanie.png","images/beanie Close.png","images/icecap-model.jpg"],"sizes":["One Size"],"darkBg":true,"status":"available","desc":"Ribbed knit ice cap in rust orange. Embroidered logo tag. Soft acrylic blend."},{"id":"p5","collection":"mad-scientist","name":"Rickshaw Tee","price":55,"image":"images/rickshaw-model-front.png","images":["images/rak-front.png","images/rak-close.png","images/rak-back.png","images/rickshaw-model-front.png","images/rickshaw-model-back.png"],"sizes":["S","M","L","XL","XXL"],"darkBg":false,"status":"available","desc":"Oversize tee with isometric coffee lady illustration on front and exploded-view blueprint on back. 100% cotton."},{"id":"p6","collection":"mad-scientist","name":"Caffein Beat","price":55,"image":"images/coffee-model-front.png","images":["images/caffein-front.jpg","images/caffein-close.jpg","images/caffein-back.jpg","images/coffee-model-front.png","images/coffee-model-back.png"],"sizes":["S","M","L","XL","XXL"],"darkBg":false,"status":"available","desc":"Oversize tee featuring the iconic Sudanese coffee lady reimagined in isometric style. 100% cotton."}]};
+
+let currentProduct = null;
+let selectedSize = null;
+
+async function loadProduct() {
+  let data;
+  try { const r = await fetch('data.json?t='+Date.now()); data = await r.json(); } catch(e) { data = FALLBACK; }
+
+  const params = new URLSearchParams(window.location.search);
+  const pid = params.get('id');
+  if (!pid) { window.location.href = 'index.html'; return; }
+
+  const product = data.products.find(p => p.id === pid);
+  if (!product) { window.location.href = 'index.html'; return; }
+  currentProduct = product;
+
+  const col = data.collections.find(c => c.id === product.collection);
+
+  document.title = product.name + ' — The Arabic Market';
+
+  // Breadcrumb
+  document.getElementById('colLink').textContent = col ? col.name : '';
+  document.getElementById('colLink').href = 'store.html?collection=' + product.collection;
+  document.getElementById('prodBreadcrumb').textContent = product.name;
+
+  // Info
+  document.getElementById('prodTitle').textContent = product.name;
+  document.getElementById('prodPrice').innerHTML = product.price.toFixed(2) + ' <span class="sar"></span>';
+  document.getElementById('prodDesc').textContent = product.desc || '';
+
+  // Images (vertical scroll)
+  const imgs = product.images || [product.image];
+  document.getElementById('productImages').innerHTML = imgs.map(src =>
+    `<img src="${src}" alt="${product.name}">`
+  ).join('');
+
+  // Sizes
+  const sizes = product.sizes || ['S','M','L','XL'];
+  document.getElementById('sizeGrid').innerHTML = sizes.map(s =>
+    `<button class="size-btn" onclick="selectSize(this,'${s}')">${s}</button>`
+  ).join('');
+
+  // Button price & mobile header
+  document.getElementById('btnPrice').innerHTML = product.price.toFixed(2) + ' <span class="sar"></span>';
+  document.getElementById('mobileTitle').textContent = product.name;
+  document.getElementById('mobilePrice').innerHTML = product.price.toFixed(2) + ' <span class="sar"></span>';
+
+  // Auto-select first size
+  const firstBtn = document.querySelector('.size-btn');
+  if (firstBtn) { firstBtn.click(); }
+}
+
+function selectSize(btn, size) {
+  selectedSize = size;
+  document.getElementById('sizeSelected').textContent = size;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleDesc() {
+  const desc = document.getElementById('prodDesc');
+  const toggle = document.getElementById('detailToggle');
+  desc.classList.toggle('show');
+  toggle.classList.toggle('open');
+}
+
+function addToCart() {
+  if (!selectedSize) return;
+  Cart.add(currentProduct, selectedSize);
+  showToast(`${currentProduct.name} (${selectedSize}) added to cart`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastText').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function toggleTheme() {
+  const curr = document.documentElement.getAttribute('data-theme');
+  const next = curr === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+
+loadProduct().then(() => Lang.apply());
+</script>
+<script src="cart.js"></script>
+</body>
+</html>

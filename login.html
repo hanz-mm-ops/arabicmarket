@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — The Arabic Market</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #fafaf8;
+  --white: #ffffff;
+  --black: #0a0a0a;
+  --gray-100: #f5f5f3;
+  --gray-200: #e8e8e4;
+  --gray-300: #d0d0cc;
+  --gray-400: #999;
+  --gray-500: #666;
+  --accent: #c8510b;
+  --font: 'Space Grotesk', sans-serif;
+  --body: 'Inter', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ─── Background Pattern ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(200,81,11,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(200,81,11,0.02) 0%, transparent 40%),
+    radial-gradient(circle at 60% 80%, rgba(200,81,11,0.02) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* ─── Login Container ─── */
+.login-container {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  padding: 0 24px;
+  animation: fadeUp 0.6s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Card ─── */
+.login-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  padding: 48px 40px;
+  text-align: center;
+}
+
+/* ─── Logo ─── */
+.login-logo {
+  margin-bottom: 32px;
+}
+
+.login-logo img {
+  height: 40px;
+  margin: 0 auto;
+}
+
+/* ─── Title ─── */
+.login-title {
+  font-family: var(--font);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.login-subtitle {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  margin-bottom: 36px;
+  line-height: 1.5;
+}
+
+/* ─── Form ─── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  position: relative;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  margin-bottom: 8px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  padding-right: 48px;
+  font-family: var(--body);
+  font-size: 0.95rem;
+  background: var(--gray-100);
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  color: var(--black);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: var(--black);
+  background: var(--white);
+}
+
+.input-group input::placeholder {
+  color: var(--gray-400);
+}
+
+/* ─── Toggle Password ─── */
+.toggle-pw {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-400);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.toggle-pw:hover { color: var(--black); }
+
+/* ─── Submit Button ─── */
+.login-btn {
+  width: 100%;
+  padding: 15px;
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn:hover {
+  background: #222;
+  transform: translateY(-1px);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+/* ─── Error Message ─── */
+.error-msg {
+  font-size: 0.85rem;
+  color: #d4342a;
+  min-height: 20px;
+  margin-top: 4px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.25s ease;
+}
+
+.error-msg.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Shake Animation ─── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.shake {
+  animation: shake 0.4s ease;
+}
+
+/* ─── Footer ─── */
+.login-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.8rem;
+  color: var(--gray-400);
+  letter-spacing: 0.02em;
+}
+
+.login-footer span {
+  color: var(--accent);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 36px 28px;
+    border-radius: 12px;
+  }
+  .login-title { font-size: 1.3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="images/logo.svg" alt="The Arabic Market" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\'font-family:Space Grotesk,sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:-0.02em\'>The Arabic Market</div>'">
+    </div>
+
+    <h1 class="login-title">Welcome Back</h1>
+    <p class="login-subtitle">Enter the password to access the site</p>
+
+    <form class="login-form" id="loginForm">
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password" autocomplete="off" autofocus>
+        <button type="button" class="toggle-pw" onclick="togglePassword()">
+          <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+
+      <button type="submit" class="login-btn">Enter Site</button>
+
+      <div class="error-msg" id="errorMsg">Incorrect password. Please try again.</div>
+    </form>
+  </div>
+
+  <div class="login-footer">
+    The Arabic <span>Market</span>
+  </div>
+
+  <button class="lang-btn" onclick="Lang.toggle(); location.reload();" style="position:fixed;top:1.5rem;right:1.5rem;background:none;border:1px solid rgba(0,0,0,0.2);color:var(--black);cursor:pointer;font-family:var(--font);font-size:0.7rem;font-weight:600;padding:0.3rem 0.6rem;border-radius:4px;">
+    <span class="lang-btn-text">عربي</span>
+  </button>
+</div>
+
+<script src="lang.js"></script>
+<script src="auth.js"></script>
+<script>
+// Check if already logged in
+if (sessionStorage.getItem("tam_auth") === "valid") {
+  window.location.href = "index.html";
+}
+
+// Form submission
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const pw = document.getElementById("password").value;
+  const errorMsg = document.getElementById("errorMsg");
+  const card = document.querySelector(".login-card");
+
+  const result = TAM_Auth.login(pw);
+  if (result.valid) {
+    document.querySelector(".login-container").style.transition = "opacity 0.3s, transform 0.3s";
+    document.querySelector(".login-container").style.opacity = "0";
+    document.querySelector(".login-container").style.transform = "translateY(-10px)";
+    setTimeout(function() {
+      window.location.href = "index.html";
+    }, 300);
+  } else {
+    errorMsg.classList.add("show");
+    card.classList.add("shake");
+    setTimeout(function() { card.classList.remove("shake"); }, 400);
+    document.getElementById("password").select();
+  }
+});
+
+// Hide error on typing
+document.getElementById("password").addEventListener("input", function() {
+  document.getElementById("errorMsg").classList.remove("show");
+});
+
+// Toggle password visibility
+function togglePassword() {
+  const input = document.getElementById("password");
+  const icon = document.getElementById("eyeIcon");
+  if (input.type === "password") {
+    input.type = "text";
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    input.type = "password";
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+</script>
+</body>
+</html>

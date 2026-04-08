@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="auth.js"></script>
+<title>My Account — The Arabic Market</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { min-height: 100vh; }
+body { display: flex; flex-direction: column; }
+main { flex: 1; }
+:root {
+  --bg: #fafaf8;
+  --white: #ffffff;
+  --black: #0a0a0a;
+  --gray-100: #f5f5f3;
+  --gray-200: #e8e8e4;
+  --gray-300: #d0d0cc;
+  --gray-400: #999;
+  --gray-500: #666;
+  --accent: #c8510b;
+  --green: #1a8a4a;
+  --font: 'Space Grotesk', sans-serif;
+  --body: 'Inter', sans-serif;
+}
+[data-theme="dark"] {
+  --bg: #0a0a0a; --white: #141414; --black: #f0f0f0;
+  --gray-100: #1a1a1a; --gray-200: #2a2a2a; --gray-300: #3a3a3a;
+  --gray-400: #888; --gray-500: #aaa;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--black); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+.sar { display: inline-block; width: 1em; height: 1em; background: url('images/sar.svg') no-repeat center/contain; vertical-align: -0.1em; }
+[data-theme="dark"] .sar { filter: brightness(0) invert(1); }
+
+/* ─── NAV ─── */
+.nav {
+  background: var(--white); border-bottom: 1px solid var(--gray-200);
+  padding: 0 2rem; height: 70px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+[data-theme="dark"] .nav { background: #141414; border-color: #222; }
+.nav-logo img { height: 50px; width: auto; }
+[data-theme="dark"] .nav-logo img { filter: brightness(0) invert(1); }
+.nav-actions { display: flex; align-items: center; gap: 1rem; }
+.nav-actions a, .nav-actions button { color: var(--black); }
+.lang-btn {
+  background: none; border: 1px solid var(--gray-300); color: var(--black);
+  cursor: pointer; font-family: var(--font); font-size: 0.7rem; font-weight: 600;
+  padding: 0.3rem 0.6rem; border-radius: 4px; transition: all 0.2s;
+}
+.lang-btn:hover { background: var(--gray-100); }
+.theme-toggle { background: none; border: none; cursor: pointer; display: flex; color: var(--black); }
+.theme-toggle svg { width: 20px; height: 20px; }
+.icon-sun { display: none; }
+[data-theme="dark"] .icon-moon { display: none; }
+[data-theme="dark"] .icon-sun { display: block; }
+
+/* ─── ACCOUNT LAYOUT ─── */
+.account-wrap {
+  max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem;
+}
+
+/* ─── WELCOME ─── */
+.welcome-card {
+  background: #0a0a0a; color: #fff; border-radius: 16px;
+  padding: 2.5rem; margin-bottom: 2rem; position: relative; overflow: hidden;
+}
+[data-theme="dark"] .welcome-card { background: #1a1a1a; color: #f0f0f0; }
+.welcome-card::after {
+  content: ''; position: absolute; top: -50%; right: -10%;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: var(--accent); opacity: 0.08;
+}
+.welcome-greeting {
+  font-family: var(--font); font-size: 1.8rem; font-weight: 700;
+  letter-spacing: -0.02em; margin-bottom: 0.3rem; position: relative; z-index: 1;
+}
+.welcome-sub {
+  font-size: 0.85rem; color: rgba(255,255,255,0.45); position: relative; z-index: 1;
+}
+[data-theme="dark"] .welcome-sub { color: rgba(255,255,255,0.35); }
+
+/* ─── TABS ─── */
+.account-tabs {
+  display: flex; gap: 0; border-bottom: 2px solid var(--gray-200); margin-bottom: 2rem;
+}
+.account-tab {
+  padding: 0.8rem 1.5rem; font-family: var(--font); font-size: 0.85rem;
+  font-weight: 500; color: var(--gray-400); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none;
+}
+.account-tab:hover { color: var(--black); }
+.account-tab.active { color: var(--black); border-bottom-color: var(--black); }
+[data-theme="dark"] .account-tabs { border-color: #2a2a2a; }
+[data-theme="dark"] .account-tab:hover { color: #f0f0f0; }
+[data-theme="dark"] .account-tab.active { color: #f0f0f0; border-bottom-color: #f0f0f0; }
+
+/* ─── PANELS ─── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ─── PROFILE FORM ─── */
+.profile-card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: 14px; padding: 2rem;
+}
+[data-theme="dark"] .profile-card { background: #141414; border-color: #222; }
+.profile-avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font); font-size: 1.6rem; font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.form-row.full { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; }
+.form-label {
+  font-size: 0.7rem; font-weight: 600; color: var(--gray-500);
+  letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 0.4rem;
+}
+.form-input {
+  padding: 0.75rem 1rem; border: 1.5px solid var(--gray-200); border-radius: 8px;
+  font-family: var(--body); font-size: 0.88rem;
+  background: var(--bg); color: var(--black); outline: none; transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--black); }
+[data-theme="dark"] .form-input { background: #0a0a0a; border-color: #333; }
+[data-theme="dark"] .form-input:focus { border-color: #f0f0f0; }
+.btn-save {
+  padding: 0.75rem 2rem; background: #0a0a0a; color: #fff;
+  font-family: var(--font); font-size: 0.85rem; font-weight: 600;
+  border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem;
+}
+.btn-save:hover { opacity: 0.85; }
+[data-theme="dark"] .btn-save { background: #f0f0f0; color: #0a0a0a; }
+.btn-logout {
+  padding: 0.75rem 2rem; background: none; color: var(--gray-500);
+  font-family: var(--font); font-size: 0.85rem; font-weight: 500;
+  border: 1.5px solid var(--gray-200); border-radius: 8px; cursor: pointer;
+  transition: all 0.2s; margin-top: 0.5rem;
+}
+.btn-logout:hover { border-color: #d4342a; color: #d4342a; }
+[data-theme="dark"] .btn-logout { border-color: #333; color: #888; }
+
+/* ─── ORDERS ─── */
+.order-card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;
+  transition: border-color 0.2s;
+}
+.order-card:hover { border-color: var(--gray-300); }
+[data-theme="dark"] .order-card { background: #141414; border-color: #222; }
+[data-theme="dark"] .order-card:hover { border-color: #333; }
+.order-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--gray-200);
+}
+[data-theme="dark"] .order-header { border-color: #222; }
+.order-id { font-family: var(--font); font-size: 0.9rem; font-weight: 600; }
+.order-date { font-size: 0.78rem; color: var(--gray-500); }
+.order-status {
+  display: inline-block; padding: 0.2rem 0.7rem; border-radius: 50px;
+  font-size: 0.7rem; font-weight: 600;
+}
+.status-delivered { background: #e8f5e9; color: var(--green); }
+.status-processing { background: #fff3e0; color: #e65100; }
+.status-shipped { background: #e3f2fd; color: #1565c0; }
+.order-items { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.order-item-img {
+  width: 50px; height: 60px; border-radius: 6px; overflow: hidden;
+  background: var(--gray-100);
+}
+.order-item-img img { width: 100%; height: 100%; object-fit: cover; }
+[data-theme="dark"] .order-item-img { background: #2a2a2a; }
+[data-theme="dark"] .order-item-img img { filter: brightness(0.82); }
+.order-total {
+  font-family: var(--font); font-size: 1rem; font-weight: 600; text-align: right;
+}
+.orders-empty {
+  text-align: center; padding: 4rem 2rem; color: var(--gray-400);
+}
+.orders-empty svg { width: 56px; height: 56px; color: var(--gray-300); margin-bottom: 1rem; }
+.orders-empty p { font-size: 0.9rem; margin-bottom: 1.5rem; }
+.orders-empty a {
+  display: inline-block; padding: 0.7rem 2rem; background: #0a0a0a; color: #fff;
+  font-family: var(--font); font-size: 0.85rem; font-weight: 500; border-radius: 8px;
+  transition: background 0.2s;
+}
+.orders-empty a:hover { background: #222; }
+[data-theme="dark"] .orders-empty a { background: #f0f0f0; color: #0a0a0a; }
+[data-theme="dark"] .orders-empty a:hover { background: #ddd; }
+
+/* ─── FOOTER ─── */
+footer { background: #0a0a0a; color: #fff; padding: 3rem 2rem 1.5rem; }
+[data-theme="dark"] footer { background: #111; }
+.footer-inner { max-width: 1400px; margin: 0 auto; }
+.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.footer-logo { display: inline-block; margin-bottom: 1rem; }
+.footer-logo img { height: 50px; width: auto; filter: brightness(0) invert(1); opacity: 0.35; }
+.footer-brand-desc { font-size: 0.8rem; line-height: 1.7; color: rgba(255,255,255,0.35); max-width: 280px; }
+.footer-col h4 { font-family: var(--font); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 1rem; }
+.footer-col a { display: block; font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 0.6rem; transition: color 0.2s; }
+.footer-col a:hover { color: var(--white); }
+.footer-bottom { display: flex; justify-content: space-between; padding-top: 1.5rem; font-size: 0.7rem; color: rgba(255,255,255,0.2); }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+  background: #0a0a0a; color: #fff; padding: 0.8rem 1.5rem;
+  border-radius: 10px; font-size: 0.85rem; font-weight: 500; z-index: 300;
+  opacity: 0; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+[data-theme="dark"] .toast { background: #f0f0f0; color: #0a0a0a; }
+
+@media (max-width: 768px) {
+  .nav { height: 60px; padding: 0 1rem; }
+  .nav-logo img { height: 40px; }
+  .nav-actions { gap: 0.8rem; }
+  .nav-actions svg { width: 18px; height: 18px; }
+  .lang-btn { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
+  .account-wrap { padding: 1.5rem; }
+  .welcome-greeting { font-size: 1.4rem; }
+  .form-row { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+  .order-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo.svg" alt="The Arabic Market">
+  </a>
+  <div class="nav-actions">
+    <button class="lang-btn" onclick="Lang.toggle(); location.reload();" aria-label="Switch language">
+      <span class="lang-btn-text">عربي</span>
+    </button>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+      <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>
+      <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>
+    </button>
+    <a href="store.html" style="color:var(--black);display:flex;">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
+    </a>
+  </div>
+</nav>
+
+<main>
+<div class="account-wrap">
+
+  <!-- WELCOME -->
+  <div class="welcome-card">
+    <div class="welcome-greeting" id="welcomeGreeting">Welcome back, Guest</div>
+    <div class="welcome-sub" id="welcomeSub">Member since April 2026</div>
+  </div>
+
+  <!-- TABS -->
+  <div class="account-tabs">
+    <button class="account-tab active" data-tab="profile" id="tabProfile">My Profile</button>
+    <button class="account-tab" data-tab="orders" id="tabOrders">My Orders</button>
+  </div>
+
+  <!-- PROFILE PANEL -->
+  <div class="tab-panel active" id="panel-profile">
+    <div class="profile-card">
+      <div class="profile-avatar" id="profileAvatar">G</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" id="labelName">Full Name</label>
+          <input class="form-input" id="userName" type="text" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="labelEmail">Email</label>
+          <input class="form-input" id="userEmail" type="email" placeholder="your@email.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" id="labelPhone">Phone</label>
+          <input class="form-input" id="userPhone" type="tel" placeholder="+966 XXX XXX XXX">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input class="form-input" id="userAddress" type="text" placeholder="Your address">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.8rem;margin-top:1rem;flex-wrap:wrap;">
+        <button class="btn-save" id="btnSave" onclick="saveProfile()">Save Changes</button>
+        <button class="btn-logout" id="btnLogout" onclick="TAM_Auth.logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS PANEL -->
+  <div class="tab-panel" id="panel-orders">
+    <div id="ordersList"></div>
+  </div>
+
+</div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <a href="index.html" class="footer-logo"><img src="images/logo.svg" alt="The Arabic Market"></a>
+        <p class="footer-brand-desc">Sudanese streetwear brand.<br>Culture wears well.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="store.html?collection=sudan">Republic of Sudan</a>
+        <a href="store.html?collection=mad-scientist">The Mad Scientist</a>
+        <a href="store.html">All Products</a>
+      </div>
+      <div class="footer-col">
+        <h4>Info</h4>
+        <a href="#">Sizing Guide</a>
+        <a href="#">Shipping</a>
+        <a href="#">Returns</a>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2025 The Arabic Market. All rights reserved.</span>
+      <span>Designed in Sudan</span>
+    </div>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="lang.js"></script>
+<script>
+// ─── THEME ───
+function toggleTheme() {
+  const curr = document.documentElement.getAttribute('data-theme');
+  const next = curr === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+
+// ─── USER DATA ───
+const USER_KEY = 'tam_user';
+const ORDERS_KEY = 'tam_orders';
+
+function getUserData() {
+  try { return JSON.parse(localStorage.getItem(USER_KEY)) || {}; } catch(e) { return {}; }
+}
+
+function saveUserData(data) {
+  localStorage.setItem(USER_KEY, JSON.stringify(data));
+}
+
+function getOrders() {
+  try { return JSON.parse(localStorage.getItem(ORDERS_KEY)) || []; } catch(e) { return []; }
+}
+
+// ─── INIT PROFILE ───
+function initProfile() {
+  const user = getUserData();
+  const name = user.name || Lang.t('user_guest');
+  const initial = name.charAt(0).toUpperCase();
+
+  document.getElementById('welcomeGreeting').textContent = Lang.t('user_welcome') + ', ' + name;
+  document.getElementById('welcomeSub').textContent = Lang.t('user_member_since') + ' ' + (user.joinDate || 'April 2026');
+  document.getElementById('profileAvatar').textContent = initial;
+
+  document.getElementById('userName').value = user.name || '';
+  document.getElementById('userEmail').value = user.email || '';
+  document.getElementById('userPhone').value = user.phone || '';
+  document.getElementById('userAddress').value = user.address || '';
+
+  // Translate labels
+  document.getElementById('tabProfile').textContent = Lang.t('user_profile');
+  document.getElementById('tabOrders').textContent = Lang.t('user_orders');
+  document.getElementById('labelName').textContent = Lang.t('user_name');
+  document.getElementById('labelEmail').textContent = Lang.t('user_email');
+  document.getElementById('labelPhone').textContent = Lang.t('user_phone');
+  document.getElementById('btnSave').textContent = Lang.t('user_save');
+  document.getElementById('btnLogout').textContent = Lang.t('user_logout');
+}
+
+function saveProfile() {
+  const user = getUserData();
+  user.name = document.getElementById('userName').value.trim();
+  user.email = document.getElementById('userEmail').value.trim();
+  user.phone = document.getElementById('userPhone').value.trim();
+  user.address = document.getElementById('userAddress').value.trim();
+  if (!user.joinDate) user.joinDate = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  saveUserData(user);
+  initProfile();
+  showToast(Lang.isAr() ? 'تم حفظ التغييرات' : 'Profile saved');
+}
+
+// ─── ORDERS ───
+function renderOrders() {
+  const orders = getOrders();
+  const container = document.getElementById('ordersList');
+
+  if (orders.length === 0) {
+    container.innerHTML = `
+      <div class="orders-empty">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
+        </svg>
+        <p>${Lang.t('user_no_orders')}</p>
+        <a href="store.html">${Lang.isAr() ? 'تسوّق الآن' : 'Start Shopping'}</a>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = orders.map(function(order, i) {
+    const statusClass = order.status === 'delivered' ? 'status-delivered' :
+                        order.status === 'shipped' ? 'status-shipped' : 'status-processing';
+    const statusText = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+    const images = order.items.map(function(item) {
+      return '<div class="order-item-img"><img src="' + item.image + '" alt="' + item.name + '"></div>';
+    }).join('');
+
+    return '<div class="order-card">' +
+      '<div class="order-header">' +
+        '<div><div class="order-id">#TAM-' + String(1000 + i).slice(-4) + '</div>' +
+        '<div class="order-date">' + order.date + '</div></div>' +
+        '<span class="order-status ' + statusClass + '">' + statusText + '</span>' +
+      '</div>' +
+      '<div class="order-items">' + images + '</div>' +
+      '<div class="order-total">' + order.total.toFixed(2) + ' <span class="sar"></span></div>' +
+    '</div>';
+  }).join('');
+}
+
+// ─── TABS ───
+document.querySelectorAll('.account-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.account-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+// ─── INIT ───
+initProfile();
+renderOrders();
+</script>
+</body>
+</html>

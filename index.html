@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="auth.js"></script>
+<title>The Arabic Market</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { min-height: 100vh; }
+body { display: flex; flex-direction: column; }
+main { flex: 1; }
+
+:root {
+  --bg: #fafaf8;
+  --white: #ffffff;
+  --black: #0a0a0a;
+  --dark: #1a1a1a;
+  --gray-100: #f5f5f3;
+  --gray-200: #e8e8e4;
+  --gray-300: #d0d0cc;
+  --gray-400: #999;
+  --gray-500: #666;
+  --accent: #c8510b;
+  --font: 'Space Grotesk', sans-serif;
+  --body: 'Inter', sans-serif;
+}
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --white: #141414;
+  --black: #f0f0f0;
+  --dark: #e8e8e8;
+  --gray-100: #1a1a1a;
+  --gray-200: #2a2a2a;
+  --gray-300: #3a3a3a;
+  --gray-400: #888;
+  --gray-500: #aaa;
+}
+[data-theme="dark"] .nav.solid { background: rgba(10,10,10,0.95); border-color: #222; }
+[data-theme="dark"] .nav.solid .nav-logo img { filter: brightness(0) invert(1); }
+[data-theme="dark"] .product-img { background: #2a2a2a; }
+[data-theme="dark"] .product-img img { filter: brightness(0.82); }
+[data-theme="dark"] .product-img .img-product { background: #2a2a2a; }
+[data-theme="dark"] .col-banner { background: #141414; }
+[data-theme="dark"] .col-banner:hover { background: #1e1e1e; }
+[data-theme="dark"] .col-banner-img img { filter: brightness(0.82); }
+[data-theme="dark"] .col-banner-title { color: #f0f0f0; }
+[data-theme="dark"] .col-banner-story { color: rgba(255,255,255,0.4); }
+[data-theme="dark"] .col-banner-cta { color: #f0f0f0; }
+[data-theme="dark"] footer { background: #141414; }
+[data-theme="dark"] .newsletter { border-color: #222; }
+[data-theme="dark"] .newsletter-form input { background: #1a1a1a; border-color: #333; color: #f0f0f0; }
+[data-theme="dark"] .hero-btn { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
+[data-theme="dark"] .hero-btn:hover { background: var(--accent); border-color: var(--accent); }
+[data-theme="dark"] .slider-arrow { background: #1a1a1a; border-color: #333; }
+[data-theme="dark"] .slider-arrow svg { stroke: #f0f0f0; }
+[data-theme="dark"] .footer-logo img { filter: brightness(0) invert(1); }
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--black);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--black); color: var(--white); }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+.sar { display: inline-block; width: 1em; height: 1em; background: url('images/sar.svg') no-repeat center/contain; vertical-align: -0.1em; }
+[data-theme="dark"] .sar { filter: brightness(0) invert(1); }
+
+/* ─── NAV ─── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  transition: all 0.4s ease;
+}
+.nav.solid {
+  background: rgba(250,250,248,0.95);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--gray-200);
+}
+.nav.solid .nav-logo, .nav.solid .nav-links a, .nav.solid .nav-cart, .nav.solid .nav-search, .nav.solid .nav-user { color: var(--black); }
+.nav.solid .nav-logo img { filter: brightness(0); }
+.nav.hidden { transform: translateY(-100%); }
+.nav-inner {
+  max-width: 100%; margin: 0 auto;
+  padding: 0 2rem;
+  height: 80px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.nav-links {
+  display: flex; gap: 2rem; align-items: center;
+}
+.nav-links a {
+  font-size: 0.8rem; font-weight: 500;
+  color: var(--white);
+  letter-spacing: 0.05em; text-transform: uppercase;
+  transition: opacity 0.2s;
+}
+.nav-links a:hover { opacity: 0.7; }
+.nav-logo {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font);
+  font-weight: 700; font-size: 1.1rem;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  justify-self: center;
+}
+.nav-logo img { height: 70px; width: auto; filter: brightness(0) invert(1); }
+.nav-right {
+  display: flex; gap: 1.2rem; align-items: center;
+  justify-self: end;
+}
+.nav-cart {
+  position: relative;
+  display: flex; align-items: center;
+  color: var(--white);
+  cursor: pointer;
+}
+.nav-cart svg { width: 20px; height: 20px; }
+.cart-count {
+  background: var(--accent); color: var(--white);
+  font-size: 0.55rem; font-weight: 700;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: absolute; top: -5px; right: -8px;
+}
+.lang-btn {
+  background: none; border: 1px solid rgba(255,255,255,0.3);
+  color: var(--white); cursor: pointer;
+  font-family: var(--font); font-size: 0.7rem; font-weight: 600;
+  padding: 0.3rem 0.6rem; border-radius: 4px;
+  letter-spacing: 0.03em; transition: all 0.2s;
+}
+.lang-btn:hover { background: rgba(255,255,255,0.1); }
+.nav.solid .lang-btn { color: var(--black); border-color: var(--gray-300); }
+.nav.solid .lang-btn:hover { background: var(--gray-100); }
+[data-theme="dark"] .nav.solid .lang-btn { border-color: #444; }
+.nav-user {
+  color: var(--white); cursor: pointer;
+  display: flex; align-items: center;
+}
+.nav-user svg { width: 20px; height: 20px; }
+.nav.solid .nav-user { color: var(--black); }
+[dir="rtl"] .nav-links { direction: rtl; }
+.nav-search {
+  color: var(--white); cursor: pointer;
+  display: flex; align-items: center;
+}
+.nav-search svg { width: 20px; height: 20px; }
+.theme-toggle {
+  color: var(--white); cursor: pointer;
+  display: flex; align-items: center;
+  background: none; border: none; padding: 0;
+}
+.nav.solid .theme-toggle { color: var(--black); }
+.theme-toggle svg { width: 20px; height: 20px; }
+.theme-toggle .icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+[data-theme="dark"] .nav.solid .theme-toggle { color: #f0f0f0; }
+
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7);
+}
+.hero-overlay {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 2vh;
+  gap: 1rem;
+}
+.hero-buttons {
+  display: flex; gap: 1rem;
+}
+.hero-btn {
+  padding: 0.9rem 2.5rem;
+  font-family: var(--font); font-size: 0.85rem; font-weight: 500;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255,255,255,0.5); cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(0,0,0,0.1);
+  color: #fff;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+.hero-btn:hover {
+  background: var(--accent); color: #fff;
+  border-color: var(--accent);
+}
+.hero-tagline {
+  font-family: var(--font);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+}
+
+/* ─── SECTION ─── */
+.section {
+  max-width: 100%; padding: 3rem 1.5rem;
+}
+.section-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+}
+.section-title {
+  font-family: var(--font);
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.section-tabs {
+  display: flex; gap: 1.2rem; align-items: baseline;
+}
+.section-tab {
+  font-size: 0.8rem; font-weight: 400;
+  color: var(--gray-400);
+  cursor: pointer; transition: color 0.2s;
+  background: none; border: none; font-family: var(--body);
+}
+.section-tab:hover, .section-tab.active { color: var(--black); }
+.section-tab sup {
+  font-size: 0.55rem; vertical-align: super;
+  margin-left: 1px;
+}
+.section-link {
+  font-size: 0.8rem; font-weight: 400;
+  color: var(--gray-400);
+  transition: color 0.2s;
+}
+.section-link:hover { color: var(--black); }
+
+/* ─── PRODUCT SLIDER ─── */
+.products-slider-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.products-slider {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 0.5rem;
+}
+.products-slider::-webkit-scrollbar { display: none; }
+.products-slider .product-card {
+  flex: 0 0 calc(20% - 0.4rem);
+  scroll-snap-align: start;
+}
+.slider-arrows {
+  position: absolute; top: 40%; right: 1.5rem;
+  display: flex; gap: 0.4rem; z-index: 5;
+}
+.slider-arrow {
+  width: 36px; height: 36px;
+  background: var(--white); border: 1px solid var(--gray-200);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.slider-arrow:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+.slider-arrow:hover svg { stroke: var(--white); }
+.slider-arrow svg { width: 16px; height: 16px; stroke: var(--black); }
+.view-all-link {
+  font-family: var(--font); font-size: 0.8rem; font-weight: 500;
+  color: var(--gray-500); transition: color 0.2s;
+  display: flex; align-items: center; gap: 0.3rem;
+}
+.view-all-link:hover { color: var(--black); }
+.view-all-link svg { width: 14px; height: 14px; }
+.product-card {
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.product-img {
+  overflow: hidden;
+  aspect-ratio: 3/4;
+  position: relative;
+  background: var(--gray-100);
+}
+.product-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: opacity 0.4s ease;
+}
+.product-img .img-model { position: relative; z-index: 1; }
+.product-img .img-product {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: cover;
+  background: var(--gray-100);
+  opacity: 0; z-index: 2;
+  transition: opacity 0.4s ease;
+}
+.product-card:hover .img-product { opacity: 1; }
+.product-card:hover .img-model { opacity: 0; }
+.product-badge {
+  position: absolute; top: 0.7rem; left: 0.7rem;
+  font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--black);
+  z-index: 3;
+}
+.product-add {
+  position: absolute; bottom: 0.7rem; right: 0.7rem;
+  width: 28px; height: 28px;
+  background: var(--white); border: 1px solid var(--gray-200);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 3;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.product-add svg { width: 14px; height: 14px; stroke: var(--black); }
+.product-card:hover .product-add { opacity: 1; }
+.product-info {
+  padding: 0.6rem 0.2rem;
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.product-name {
+  font-size: 0.78rem; font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.product-price {
+  font-size: 0.78rem; font-weight: 400;
+  color: var(--gray-500);
+}
+
+/* ─── COLLECTION BANNERS ─── */
+.collection-banners {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+.col-banner {
+  background: var(--black);
+  cursor: pointer;
+  transition: background 0.4s ease;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+.col-banner:hover { background: #1a1a1a; }
+.col-banner-text {
+  padding: 2rem;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  min-height: 360px;
+}
+.col-banner-tag {
+  font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+.col-banner-title {
+  font-family: var(--font);
+  font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+.col-banner-story {
+  font-size: 0.78rem; line-height: 1.7;
+  color: rgba(255,255,255,0.4);
+  max-width: 300px;
+}
+.col-banner-cta {
+  margin-top: 1.5rem;
+  font-family: var(--font); font-size: 0.75rem; font-weight: 500;
+  color: var(--white);
+  display: flex; align-items: center; gap: 0.4rem;
+  opacity: 0.5; transition: opacity 0.3s;
+}
+.col-banner:hover .col-banner-cta { opacity: 1; }
+.col-banner-cta svg { width: 14px; height: 14px; }
+.col-banner-img {
+  overflow: hidden;
+  aspect-ratio: 3/4;
+  position: relative;
+  background: var(--black);
+}
+.col-banner-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: opacity 0.4s ease;
+}
+.col-banner-img .banner-img-front { position: relative; z-index: 1; }
+.col-banner-img .banner-img-back {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0; z-index: 2;
+}
+.col-banner:hover .banner-img-back { opacity: 1; }
+.col-banner:hover .banner-img-front { opacity: 0; }
+
+/* ─── STORY ─── */
+.story-section {
+  padding: 5rem 2rem;
+  text-align: center;
+}
+.story-inner {
+  max-width: 700px; margin: 0 auto;
+}
+.story-tag {
+  font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+.story-title {
+  font-family: var(--font);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+.story-text {
+  font-size: 0.9rem; line-height: 1.8;
+  color: var(--gray-500);
+  margin-bottom: 0.8rem;
+}
+.story-highlight {
+  font-family: var(--font);
+  font-weight: 600; color: var(--black);
+}
+
+/* ─── NEWSLETTER ─── */
+.newsletter {
+  padding: 3rem 2rem 4rem;
+  text-align: center;
+  border-top: 1px solid var(--gray-200);
+}
+.newsletter h3 {
+  font-family: var(--font);
+  font-size: 1.1rem; font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.newsletter p {
+  font-size: 0.8rem; color: var(--gray-400);
+  margin-bottom: 1.2rem;
+}
+.newsletter-form {
+  display: flex; gap: 0; max-width: 380px; margin: 0 auto;
+}
+.newsletter-form input {
+  flex: 1; padding: 0.7rem 1rem;
+  border: 1px solid var(--gray-200); border-right: none;
+  font-family: var(--body); font-size: 0.8rem;
+  outline: none; background: var(--white);
+}
+.newsletter-form input:focus { border-color: var(--black); }
+.newsletter-form button {
+  padding: 0.7rem 1.5rem;
+  background: var(--black); color: var(--white);
+  font-family: var(--font); font-size: 0.75rem; font-weight: 500;
+  border: none; cursor: pointer;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  transition: background 0.2s;
+}
+.newsletter-form button:hover { background: var(--dark); }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--black);
+  color: var(--white);
+  padding: 3rem 2rem 1.5rem;
+}
+.footer-inner { max-width: 1400px; margin: 0 auto; }
+.footer-top {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.footer-logo {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+.footer-logo img {
+  height: 50px; width: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.35;
+}
+.footer-brand-desc {
+  font-size: 0.8rem; line-height: 1.7;
+  color: rgba(255,255,255,0.35);
+  max-width: 280px;
+}
+.footer-col h4 {
+  font-family: var(--font);
+  font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  margin-bottom: 1rem;
+}
+.footer-col a {
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 0.6rem;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--white); }
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1.5rem;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.2);
+}
+
+/* ─── REVEAL ─── */
+.reveal {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal.show { opacity: 1; transform: translateY(0); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .products-slider .product-card { flex: 0 0 calc(33.33% - 0.35rem); }
+  .collection-banners { grid-template-columns: 1fr 1fr; }
+  .footer-top { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-inner { grid-template-columns: auto 1fr auto; height: 60px; padding: 0 1rem; }
+  .nav-logo { justify-self: center; }
+  .nav-logo img { height: 40px; }
+  .nav-right { gap: 0.8rem; }
+  .nav-right svg { width: 18px; height: 18px; }
+  .lang-btn { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
+  .products-slider .product-card { flex: 0 0 calc(50% - 0.3rem); }
+  .slider-arrows { display: none; }
+  .hero { height: 80vh; min-height: 500px; }
+  .hero-buttons { flex-direction: column; width: 80%; }
+  .hero-btn { width: 100%; text-align: center; }
+  .collection-banners { grid-template-columns: 1fr; gap: 0.5rem; }
+  .col-banner { grid-template-columns: 1fr; }
+  .col-banner-text { min-height: auto; padding: 1.5rem; }
+  .col-banner-img { aspect-ratio: 4/3; max-height: 280px; }
+  .col-banner-story { font-size: 0.75rem; }
+  .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+  .section-header { padding: 0; }
+  .section { padding: 2rem 1rem; }
+}
+</style>
+<link rel="stylesheet" href="cart.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <div class="nav-links">
+      <a href="store.html?collection=sudan">Republic of Sudan</a>
+      <a href="store.html?collection=mad-scientist">The Mad Scientist</a>
+    </div>
+    <a href="index.html" class="nav-logo">
+      <img src="images/logo.svg" alt="The Arabic Market">
+    </a>
+    <div class="nav-right">
+      <button class="lang-btn" onclick="Lang.toggle(); location.reload();" aria-label="Switch language">
+        <span class="lang-btn-text">عربي</span>
+      </button>
+      <a href="account.html" class="nav-user" aria-label="Account">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+      </a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>
+      </button>
+      <a href="store.html" class="nav-search">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+      </a>
+      <div class="nav-cart" onclick="Cart.open()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main>
+<!-- HERO -->
+<section class="hero" id="hero-section">
+  <video class="hero-bg" autoplay muted loop playsinline>
+    <source src="images/hero.mp4" type="video/mp4">
+  </video>
+  <div class="hero-overlay">
+    <span class="hero-tagline" id="d-heroTag"></span>
+    <div class="hero-buttons">
+      <button class="hero-btn dark" onclick="window.location.href='store.html?collection=sudan'">Republic of Sudan</button>
+      <button class="hero-btn light" onclick="window.location.href='store.html?collection=mad-scientist'">The Mad Scientist</button>
+    </div>
+  </div>
+</section>
+
+<!-- NEW ARRIVALS -->
+<div class="section" id="d-arrivals">
+  <div class="section-header">
+    <h2 class="section-title">New Arrivals</h2>
+    <a href="store.html" class="view-all-link">
+      View all <sup id="d-totalCount"></sup>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+    </a>
+  </div>
+  <div class="products-slider-wrap">
+    <div class="products-slider" id="d-allProducts"></div>
+    <div class="slider-arrows">
+      <button class="slider-arrow" onclick="slideProducts(-1)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
+      </button>
+      <button class="slider-arrow" onclick="slideProducts(1)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- COLLECTIONS -->
+<div class="section" id="d-collections-section">
+  <div class="section-header">
+    <h2 class="section-title">Collections</h2>
+  </div>
+  <div class="collection-banners" id="d-colBanners"></div>
+</div>
+
+<!-- STORY -->
+<section class="story-section reveal" id="story">
+  <div class="story-inner">
+    <div class="story-tag">Our Story</div>
+    <h2 class="story-title" id="d-storyTitle"></h2>
+    <p class="story-text" id="d-storyP1"></p>
+    <p class="story-text" id="d-storyP2"></p>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter reveal">
+  <h3 id="d-nlTitle"></h3>
+  <p id="d-nlDesc"></p>
+  <form class="newsletter-form" onsubmit="event.preventDefault();">
+    <input type="email" placeholder="your@email.com">
+    <button type="submit">Subscribe</button>
+  </form>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <a href="index.html" class="footer-logo">
+          <img src="images/logo.svg" alt="The Arabic Market">
+        </a>
+        <p class="footer-brand-desc">Sudanese streetwear brand.<br>Culture wears well.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="store.html?collection=sudan">Republic of Sudan</a>
+        <a href="store.html?collection=mad-scientist">The Mad Scientist</a>
+        <a href="store.html">All Products</a>
+      </div>
+      <div class="footer-col">
+        <h4>Info</h4>
+        <a href="#">Sizing Guide</a>
+        <a href="#">Shipping</a>
+        <a href="#">Returns</a>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2025 The Arabic Market. All rights reserved.</span>
+      <span>Designed in Sudan</span>
+    </div>
+  </div>
+</footer>
+
+<script src="lang.js"></script>
+<script>
+// ─── THEME ───
+function toggleTheme() {
+  const curr = document.documentElement.getAttribute('data-theme');
+  const next = curr === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+
+// ─── EMBEDDED FALLBACK DATA ───
+const FALLBACK = {"site":{"name":"The Arabic Market","heroTag":"Everyday Urban Aesthetics","heroTitle":"Culture\nWears Well.","heroDesc":"Sudanese streetwear rooted in identity.","heroImage":"images/hero.jpg","storyTitle":"Built from Khartoum to the World.","storyP1":"The Arabic Market is a Sudanese youth brand that bridges street culture with heritage. Every design carries a piece of who we are — from the calligraphy on our caps to the rickshaw on our tees.","storyP2":"We don't just make clothes. We tell stories. Our two collections — Republic of Sudan and The Mad Scientist — represent the duality of our culture: pride and play, tradition and chaos, roots and dreams.","newsletterTitle":"Stay in the Loop","newsletterDesc":"New drops, restocks, and exclusive early access."},"collections":[{"id":"sudan","tag":"Collection 01","name":"Republic of Sudan","desc":"Bold identity pieces inspired by Sudanese heritage.","bannerImage":"images/hoodie-model.jpg","bannerStyle":"dark","bannerImageInvert":false},{"id":"mad-scientist","tag":"Collection 02","name":"The Mad Scientist","desc":"Playful illustrations celebrating Sudanese street culture.","bannerImage":"images/rickshaw-model-front.png","bannerStyle":"light","bannerImageInvert":false}],"products":[{"id":"p1","collection":"sudan","name":"Sudan Statement Hoodie","price":85,"image":"images/hoodie-model.jpg","hoverImage":"images/hoodie-sudan.png","images":["images/hoodie-model.jpg","images/hoodie-sudan.png"],"darkBg":false,"status":"available"},{"id":"p2","collection":"sudan","name":"Heritage Emblem Cap","price":35,"image":"images/cap-model.jpg","hoverImage":"images/cap-angle.png","images":["images/cap-model.jpg","images/cap-angle.png"],"darkBg":false,"status":"available"},{"id":"p3","collection":"sudan","name":"Republic Tee","price":55,"image":"images/sweatshirt.jpg","hoverImage":"images/typography-sudan.png","images":["images/sweatshirt.jpg","images/typography-sudan.png"],"darkBg":false,"status":"available"},{"id":"p4","collection":"sudan","name":"Heritage Ice Cap","price":28,"image":"images/icecap-model.jpg","hoverImage":"images/beanie.png","images":["images/icecap-model.jpg","images/beanie.png"],"darkBg":false,"status":"available"},{"id":"p5","collection":"mad-scientist","name":"Rickshaw Tee","price":55,"image":"images/rickshaw-model-front.png","hoverImage":"images/rickshaw-model-back.png","images":["images/rickshaw-model-front.png","images/coffee-illustration.png"],"darkBg":false,"status":"available"},{"id":"p6","collection":"mad-scientist","name":"Caffein Beat","price":55,"image":"images/coffee-model-front.png","hoverImage":"images/coffee-model-back.png","images":["images/coffee-model-front.png","images/caffein-back.jpg"],"darkBg":false,"status":"available"}]};
+
+// ─── LOAD DATA & RENDER ───
+async function loadStore() {
+  let data;
+  try {
+    const res = await fetch('data.json?t=' + Date.now());
+    data = await res.json();
+  } catch (e) { data = FALLBACK; }
+
+  const s = data.site;
+
+  // Hero
+  // Hero is now a video, no need to set src
+  document.getElementById('d-heroTag').textContent = s.heroTag || 'Everyday Urban Aesthetics';
+
+  // All Products Grid
+  const allProducts = [...data.products].sort((a, b) => {
+    if (a.id === 'p2') return 1;
+    if (b.id === 'p2') return -1;
+    if (a.collection === 'mad-scientist' && b.collection !== 'mad-scientist') return -1;
+    if (a.collection !== 'mad-scientist' && b.collection === 'mad-scientist') return 1;
+    return 0;
+  });
+  document.getElementById('d-totalCount').textContent = allProducts.length;
+
+  let html = '';
+  allProducts.forEach(p => {
+    const col = data.collections.find(c => c.id === p.collection);
+    const productImg = p.hoverImage || ((p.images && p.images.length > 1) ? p.images[1] : p.image);
+    html += `
+      <a href="product.html?id=${p.id}" class="product-card reveal">
+        <div class="product-img">
+          <img class="img-model" src="${p.image}" alt="${p.name}">
+          <img class="img-product" src="${productImg}" alt="${p.name}">
+          <span class="product-badge">NEW IN</span>
+          <div class="product-add">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          </div>
+        </div>
+        <div class="product-info">
+          <span class="product-name">${p.name}</span>
+          <span class="product-price">${p.price.toFixed(2)} <span class="sar"></span></span>
+        </div>
+      </a>`;
+  });
+  document.getElementById('d-allProducts').innerHTML = html;
+
+  // Collection Banners (2 only, black boxes with image + story)
+  const colStories = {
+    'sudan': 'Born from the pride of a nation. Every stitch carries the weight of Khartoum\'s streets — the calligraphy, the eagle, the spirit of a republic that refuses to be forgotten.',
+    'mad-scientist': 'What happens when a genius reimagines the everyday? The rickshaw becomes art. The coffee lady becomes an icon. This is Sudanese street culture — deconstructed by a mad mind.'
+  };
+  const bannerImages = {
+    'sudan': { front: 'images/hoodie-model.jpg', back: 'images/hoodie-sudan.png' },
+    'mad-scientist': { front: 'images/rickshaw-model-front.png', back: 'images/rickshaw-model-back.png' }
+  };
+  let bannerHtml = '';
+  data.collections.forEach(col => {
+    const story = colStories[col.id] || col.desc;
+    const imgs = bannerImages[col.id] || { front: col.bannerImage, back: col.bannerImage };
+    bannerHtml += `
+      <a href="store.html?collection=${col.id}" class="col-banner reveal">
+        <div class="col-banner-text">
+          <div>
+            <div class="col-banner-tag">${col.tag}</div>
+            <div class="col-banner-title">${col.name}</div>
+            <div class="col-banner-story">${story}</div>
+          </div>
+          <div class="col-banner-cta">
+            Explore
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+          </div>
+        </div>
+        <div class="col-banner-img">
+          <img class="banner-img-front" src="${imgs.front}" alt="${col.name}">
+          <img class="banner-img-back" src="${imgs.back}" alt="${col.name}">
+        </div>
+      </a>`;
+  });
+  document.getElementById('d-colBanners').innerHTML = bannerHtml;
+
+  // Story
+  document.getElementById('d-storyTitle').textContent = (s.storyTitle || '').replace(/\n/g, ' ');
+  document.getElementById('d-storyP1').textContent = s.storyP1;
+  document.getElementById('d-storyP2').textContent = s.storyP2;
+
+  // Newsletter
+  document.getElementById('d-nlTitle').textContent = s.newsletterTitle;
+  document.getElementById('d-nlDesc').textContent = s.newsletterDesc;
+
+  // Cart count
+  try {
+    const cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
+    document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.qty, 0);
+  } catch(e) {}
+
+  initReveal();
+}
+
+// ─── NAV SCROLL ───
+const nav = document.getElementById('nav');
+const hero = document.getElementById('hero-section');
+let lastY = 0;
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  const heroH = hero.offsetHeight;
+  nav.classList.toggle('solid', y > heroH * 0.6);
+  if (y > heroH) {
+    nav.classList.toggle('hidden', y > lastY && y > heroH + 100);
+  } else {
+    nav.classList.remove('hidden');
+  }
+  lastY = y;
+});
+
+// ─── REVEAL ───
+function initReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('show'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal:not(.show)').forEach(el => observer.observe(el));
+}
+
+// ─── SLIDER ───
+function slideProducts(dir) {
+  const slider = document.getElementById('d-allProducts');
+  const card = slider.querySelector('.product-card');
+  if (!card) return;
+  const scrollAmt = (card.offsetWidth + 8) * 2;
+  slider.scrollBy({ left: dir * scrollAmt, behavior: 'smooth' });
+}
+
+loadStore().then(() => Lang.apply());
+</script>
+<script src="cart.js"></script>
+
+</body>
+</html>

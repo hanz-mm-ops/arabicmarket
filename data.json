@@ -1,0 +1,114 @@
+{
+  "site": {
+    "name": "The Arabic Market",
+    "heroTag": "New Collection 2025",
+    "heroTitle": "Culture\nWears Well.",
+    "heroDesc": "Sudanese streetwear rooted in identity. Two collections that tell our story — from the streets to the world.",
+    "heroImage": "images/hero.jpg",
+    "storyTitle": "Built from\nKhartoum to\nthe World.",
+    "storyP1": "The Arabic Market is a Sudanese youth brand that bridges street culture with heritage. Every design carries a piece of who we are — from the calligraphy on our caps to the rickshaw on our tees.",
+    "storyP2": "We don't just make clothes. We tell stories. Our two collections — Republic of Sudan and The Mad Scientist — represent the duality of our culture: pride and play, tradition and chaos, roots and dreams.",
+    "newsletterTitle": "Stay in the Loop",
+    "newsletterDesc": "New drops, restocks, and exclusive early access."
+  },
+  "collections": [
+    {
+      "id": "sudan",
+      "tag": "Collection 01",
+      "name": "Republic of Sudan",
+      "desc": "Bold identity pieces inspired by Sudanese heritage. Minimal design, maximum statement. Every piece carries the spirit of home.",
+      "bannerImage": "images/typography-sudan.png",
+      "bannerStyle": "dark",
+      "bannerImageInvert": false
+    },
+    {
+      "id": "mad-scientist",
+      "tag": "Collection 02",
+      "name": "The Mad Scientist",
+      "desc": "Playful isometric illustrations celebrating Sudanese street culture. The rickshaw, the coffee lady — deconstructed and reimagined by a mad genius.",
+      "bannerImage": "images/rickshaw-model-front.png",
+      "bannerStyle": "light",
+      "bannerImageInvert": false
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "collection": "sudan",
+      "name": "Sudan Statement Hoodie",
+      "price": 85.00,
+      "image": "images/hoodie-model.jpg",
+      "hoverImage": "images/hoodie-sudan.png",
+      "images": ["images/hoodie-sudan.png", "images/typography-sudan.png", "images/hoodie-model.jpg"],
+      "sizes": ["S", "M", "L", "XL", "XXL"],
+      "darkBg": false,
+      "status": "available",
+      "desc": "Premium heavyweight hoodie featuring embroidered 'Republic of Sudan' typography. Oversized fit, brushed fleece interior."
+    },
+    {
+      "id": "p2",
+      "collection": "sudan",
+      "name": "Heritage Emblem Cap",
+      "price": 35.00,
+      "image": "images/cap-model.jpg",
+      "hoverImage": "images/cap-angle.png",
+      "images": ["images/cap-angle.png", "images/cap-front.png", "images/cap-model.jpg"],
+      "sizes": ["One Size"],
+      "darkBg": false,
+      "status": "available",
+      "desc": "Washed cotton dad cap with embroidered eagle emblem. Adjustable brass buckle closure."
+    },
+    {
+      "id": "p3",
+      "collection": "sudan",
+      "name": "Republic Tee",
+      "price": 55.00,
+      "image": "images/sweatshirt.jpg",
+      "hoverImage": "images/typography-sudan.png",
+      "images": ["images/typography-sudan.png", "images/badge-logo.png", "images/sweatshirt.jpg"],
+      "sizes": ["S", "M", "L", "XL", "XXL"],
+      "darkBg": false,
+      "status": "available",
+      "desc": "Oversized heavyweight tee with back print Arabic script. 100% cotton, pre-shrunk."
+    },
+    {
+      "id": "p4",
+      "collection": "sudan",
+      "name": "Heritage Ice Cap",
+      "price": 28.00,
+      "image": "images/icecap-model.jpg",
+      "hoverImage": "images/beanie.png",
+      "images": ["images/beanie.png", "images/beanie Close.png", "images/icecap-model.jpg"],
+      "sizes": ["One Size"],
+      "darkBg": true,
+      "status": "available",
+      "desc": "Ribbed knit ice cap in rust orange. Embroidered logo tag. Soft acrylic blend."
+    },
+    {
+      "id": "p5",
+      "collection": "mad-scientist",
+      "name": "Rickshaw Tee",
+      "price": 55.00,
+      "image": "images/rickshaw-model-front.png",
+      "hoverImage": "images/rickshaw-model-back.png",
+      "images": ["images/rak-front.png", "images/rak-close.png", "images/rak-back.png", "images/rickshaw-model-front.png", "images/rickshaw-model-back.png"],
+      "sizes": ["S", "M", "L", "XL", "XXL"],
+      "darkBg": false,
+      "status": "available",
+      "desc": "Oversize tee with isometric coffee lady illustration on front and exploded-view blueprint on back. 100% cotton."
+    },
+    {
+      "id": "p6",
+      "collection": "mad-scientist",
+      "name": "Caffein Beat",
+      "price": 55.00,
+      "image": "images/coffee-model-front.png",
+      "hoverImage": "images/coffee-model-back.png",
+      "images": ["images/caffein-front.jpg", "images/caffein-close.jpg", "images/caffein-back.jpg", "images/coffee-model-front.png", "images/coffee-model-back.png"],
+      "sizes": ["S", "M", "L", "XL", "XXL"],
+      "darkBg": false,
+      "status": "available",
+      "desc": "Oversize tee featuring the iconic Sudanese coffee lady reimagined in isometric style. 100% cotton."
+    }
+  ]
+}

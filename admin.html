@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="auth.js"></script>
+<title>Admin — The Arabic Market</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #f7f7f5;
+  --white: #ffffff;
+  --black: #0a0a0a;
+  --gray-100: #f0f0ee;
+  --gray-200: #e0e0dc;
+  --gray-300: #c8c8c4;
+  --gray-400: #999;
+  --gray-500: #666;
+  --accent: #c8510b;
+  --green: #1a8a4a;
+  --red: #d4342a;
+  --font: 'Space Grotesk', sans-serif;
+  --body: 'Inter', sans-serif;
+  --sidebar-w: 240px;
+}
+html { font-size: 14px; }
+body { background: var(--bg); color: var(--black); font-family: var(--body); display: flex; min-height: 100vh; }
+.sar { display: inline-block; width: 1em; height: 1em; background: url('images/sar.svg') no-repeat center/contain; vertical-align: -0.1em; }
+[data-theme="dark"] .sar { filter: brightness(0) invert(1); }
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: var(--sidebar-w); background: var(--black); color: #fff;
+  padding: 1.5rem; display: flex; flex-direction: column;
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 50;
+}
+.sidebar-logo { font-family: var(--font); font-weight: 700; font-size: 1rem; margin-bottom: 2.5rem; }
+.sidebar-logo span { color: var(--accent); }
+.sidebar-nav { list-style: none; flex: 1; }
+.sidebar-nav li {
+  padding: 0.7rem 1rem; border-radius: 8px; margin-bottom: 0.3rem;
+  font-size: 0.9rem; font-weight: 500; cursor: pointer;
+  display: flex; align-items: center; gap: 0.6rem;
+  color: rgba(255,255,255,0.5); transition: all 0.2s;
+}
+.sidebar-nav li:hover { color: #fff; background: rgba(255,255,255,0.05); }
+.sidebar-nav li.active { color: #fff; background: rgba(255,255,255,0.1); }
+.sidebar-nav li svg { width: 18px; height: 18px; flex-shrink: 0; }
+.sidebar-link {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.8rem; color: rgba(255,255,255,0.3);
+  padding: 0.7rem 1rem; cursor: pointer; transition: color 0.2s;
+}
+.sidebar-link:hover { color: rgba(255,255,255,0.6); }
+.sidebar-link svg { width: 14px; height: 14px; }
+
+/* ─── MAIN ─── */
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 2rem; }
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 2rem;
+}
+.topbar h1 { font-family: var(--font); font-size: 1.5rem; font-weight: 700; }
+.topbar-actions { display: flex; gap: 0.5rem; }
+.btn {
+  padding: 0.6rem 1.2rem; border-radius: 8px; border: none;
+  font-family: var(--font); font-size: 0.8rem; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; display: inline-flex;
+  align-items: center; gap: 0.4rem;
+}
+.btn svg { width: 14px; height: 14px; }
+.btn-save { background: var(--black); color: #fff; }
+.btn-save:hover { background: #222; }
+.btn-outline { background: var(--white); color: var(--black); border: 1.5px solid var(--gray-200); }
+.btn-outline:hover { border-color: var(--gray-300); }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-add { background: var(--accent); color: #fff; }
+.btn-add:hover { opacity: 0.9; }
+
+/* ─── PANELS ─── */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--white); border-radius: 12px;
+  border: 1px solid var(--gray-200); padding: 1.5rem; margin-bottom: 1rem;
+}
+.card-title {
+  font-family: var(--font); font-size: 0.95rem; font-weight: 600;
+  margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.card-title .badge {
+  font-size: 0.65rem; font-weight: 600; padding: 0.2rem 0.6rem;
+  border-radius: 50px; background: var(--gray-100); color: var(--gray-500);
+}
+
+/* ─── FORM ─── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { margin-bottom: 1rem; }
+.form-group.full { grid-column: span 2; }
+.form-label {
+  display: block; font-size: 0.75rem; font-weight: 600;
+  color: var(--gray-500); margin-bottom: 0.4rem;
+  letter-spacing: 0.03em; text-transform: uppercase;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--gray-200); border-radius: 8px;
+  font-family: var(--body); font-size: 0.85rem;
+  background: var(--white); outline: none; transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--black); }
+.form-textarea { resize: vertical; min-height: 80px; }
+
+/* ─── PRODUCT TABLE ─── */
+.product-table { width: 100%; border-collapse: collapse; }
+.product-table th {
+  text-align: left; font-size: 0.7rem; font-weight: 600;
+  color: var(--gray-400); letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 0.8rem 1rem; border-bottom: 1px solid var(--gray-200);
+}
+.product-table td {
+  padding: 0.8rem 1rem; border-bottom: 1px solid var(--gray-100);
+  font-size: 0.85rem; vertical-align: middle;
+}
+.product-table tr:hover { background: var(--gray-100); }
+.product-table .img-cell {
+  width: 50px; height: 50px; border-radius: 8px;
+  background: var(--gray-100); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.product-table .img-cell img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.status-badge {
+  display: inline-block; padding: 0.2rem 0.6rem;
+  border-radius: 50px; font-size: 0.7rem; font-weight: 600;
+}
+.status-available { background: #e8f5e9; color: var(--green); }
+.status-coming-soon { background: #fff3e0; color: #e65100; }
+.actions-cell { display: flex; gap: 0.3rem; }
+.btn-icon {
+  width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--gray-200);
+  background: var(--white); cursor: pointer; display: flex;
+  align-items: center; justify-content: center; transition: all 0.2s;
+}
+.btn-icon:hover { background: var(--gray-100); }
+.btn-icon svg { width: 14px; height: 14px; color: var(--gray-500); }
+.btn-icon.delete:hover { background: #fde8e8; border-color: #fca5a5; }
+.btn-icon.delete:hover svg { color: var(--red); }
+
+/* ─── IMAGE UPLOAD ─── */
+.img-upload {
+  border: 2px dashed var(--gray-200); border-radius: 10px;
+  padding: 2rem; text-align: center; cursor: pointer;
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.img-upload:hover { border-color: var(--gray-300); background: var(--gray-100); }
+.img-upload.has-image { padding: 0; border-style: solid; }
+.img-upload img { width: 100%; height: 200px; object-fit: contain; }
+.img-upload-text { font-size: 0.8rem; color: var(--gray-400); }
+.img-upload-text strong { color: var(--accent); }
+.img-upload input[type="file"] { display: none; }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--white); border-radius: 16px;
+  width: 90%; max-width: 600px; max-height: 85vh;
+  overflow-y: auto; padding: 2rem;
+  animation: modalIn 0.2s ease;
+}
+@keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-title {
+  font-family: var(--font); font-size: 1.2rem; font-weight: 700;
+  margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;
+}
+.modal-close {
+  width: 32px; height: 32px; border-radius: 8px; border: none;
+  background: var(--gray-100); cursor: pointer; display: flex;
+  align-items: center; justify-content: center; transition: background 0.2s;
+}
+.modal-close:hover { background: var(--gray-200); }
+.modal-close svg { width: 16px; height: 16px; }
+.modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 300;
+  background: var(--black); color: #fff; padding: 0.8rem 1.5rem;
+  border-radius: 10px; font-size: 0.85rem; font-weight: 500;
+  display: flex; align-items: center; gap: 0.5rem;
+  transform: translateY(100px); opacity: 0; transition: all 0.3s ease;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast svg { width: 16px; height: 16px; color: #4ade80; }
+
+/* ─── STATS ─── */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.stat-card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: 12px; padding: 1.2rem;
+}
+.stat-label { font-size: 0.7rem; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-value { font-family: var(--font); font-size: 1.8rem; font-weight: 700; margin-top: 0.3rem; }
+.stat-sub { font-size: 0.75rem; color: var(--gray-400); margin-top: 0.2rem; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: span 1; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">The Arabic <span>Market</span></div>
+  <ul class="sidebar-nav">
+    <li class="active" data-panel="dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+      Dashboard
+    </li>
+    <li data-panel="products">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+      Products
+    </li>
+    <li data-panel="collections">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m-13.5 0A2.25 2.25 0 0 0 3 12v6.75A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V12a2.25 2.25 0 0 0-3-2.122m-13.5 0A2.25 2.25 0 0 1 7.5 7.878"/></svg>
+      Collections
+    </li>
+    <li data-panel="site">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/></svg>
+      Site Settings
+    </li>
+    <li data-panel="passwords">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+      Passwords
+    </li>
+  </ul>
+  <div class="sidebar-link" onclick="window.open('index.html','_blank')">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+    View Store
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div class="panel active" id="panel-dashboard">
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-outline" onclick="window.open('index.html','_blank')">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+          View Store
+        </button>
+      </div>
+    </div>
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="card">
+      <div class="card-title">Quick Actions</div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <button class="btn btn-add" onclick="openProductModal()">+ Add Product</button>
+        <button class="btn btn-outline" onclick="switchPanel('products')">Manage Products</button>
+        <button class="btn btn-outline" onclick="switchPanel('site')">Edit Site Content</button>
+        <button class="btn btn-outline" onclick="exportData()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+          Export JSON
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="panel" id="panel-products">
+    <div class="topbar">
+      <h1>Products</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-add" onclick="openProductModal()">+ Add Product</button>
+        <button class="btn btn-save" onclick="saveAll()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859"/></svg>
+          Save Changes
+        </button>
+      </div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="product-table">
+        <thead><tr><th></th><th>Product</th><th>Collection</th><th>Price</th><th>Status</th><th></th></tr></thead>
+        <tbody id="products-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- COLLECTIONS -->
+  <div class="panel" id="panel-collections">
+    <div class="topbar">
+      <h1>Collections</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-save" onclick="saveAll()">Save Changes</button>
+      </div>
+    </div>
+    <div id="collections-list"></div>
+  </div>
+
+  <!-- PASSWORDS -->
+  <div class="panel" id="panel-passwords">
+    <div class="topbar">
+      <h1>Password Management</h1>
+    </div>
+
+    <!-- Change Main Password -->
+    <div class="card">
+      <div class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"/></svg>
+        Main Password
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <input class="form-input" id="new-main-pw" type="text" placeholder="Enter new password">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input class="form-input" id="confirm-main-pw" type="text" placeholder="Confirm password">
+        </div>
+      </div>
+      <button class="btn btn-save" onclick="changeMainPw()" style="margin-top:0.5rem">Update Password</button>
+    </div>
+
+    <!-- Create Temp Password -->
+    <div class="card">
+      <div class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+        Create Temporary Password
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Password Code</label>
+          <div style="display:flex;gap:0.5rem">
+            <input class="form-input" id="temp-code" type="text" placeholder="e.g. GUEST2026">
+            <button class="btn btn-outline" onclick="autoGenCode()" style="white-space:nowrap;flex-shrink:0">Generate</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Label / Note</label>
+          <input class="form-input" id="temp-label" type="text" placeholder="e.g. Friend, Customer, VIP">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Expires After (hours)</label>
+          <input class="form-input" id="temp-hours" type="number" placeholder="24 (leave empty = no expiry)" min="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Uses</label>
+          <input class="form-input" id="temp-uses" type="number" placeholder="1 (leave empty = unlimited)" min="1">
+        </div>
+      </div>
+      <button class="btn btn-add" onclick="createTempPw()" style="margin-top:0.5rem">+ Create Temp Password</button>
+    </div>
+
+    <!-- Active Temp Passwords -->
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:1.5rem 1.5rem 1rem">
+        <div class="card-title" style="margin-bottom:0">Temporary Passwords</div>
+      </div>
+      <table class="product-table">
+        <thead><tr><th>Code</th><th>Label</th><th>Status</th><th>Uses</th><th>Expires</th><th></th></tr></thead>
+        <tbody id="temp-pw-tbody"></tbody>
+      </table>
+      <div id="temp-pw-empty" style="padding:2rem;text-align:center;color:var(--gray-400);font-size:0.85rem;display:none;">No temporary passwords created yet.</div>
+    </div>
+  </div>
+
+  <!-- SITE SETTINGS -->
+  <div class="panel" id="panel-site">
+    <div class="topbar">
+      <h1>Site Settings</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-save" onclick="saveAll()">Save Changes</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Hero Section</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Tag Line</label>
+          <input class="form-input" id="site-heroTag">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hero Image Path</label>
+          <input class="form-input" id="site-heroImage">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Title (use \n for line break)</label>
+          <input class="form-input" id="site-heroTitle">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="site-heroDesc"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Our Story</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Title (use \n for line break)</label>
+          <input class="form-input" id="site-storyTitle">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Paragraph 1</label>
+          <textarea class="form-textarea" id="site-storyP1"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Paragraph 2</label>
+          <textarea class="form-textarea" id="site-storyP2"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Newsletter</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input class="form-input" id="site-newsletterTitle">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input class="form-input" id="site-newsletterDesc">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modal-title-text">Add Product</span>
+      <button class="modal-close" onclick="closeProductModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <input type="hidden" id="modal-product-id">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Product Name</label>
+        <input class="form-input" id="modal-name" placeholder="e.g. Sudan Statement Hoodie">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Collection</label>
+        <select class="form-select" id="modal-collection"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Price ($)</label>
+        <input class="form-input" id="modal-price" type="number" step="0.01" placeholder="55.00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="modal-status">
+          <option value="available">Available</option>
+          <option value="coming-soon">Coming Soon</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Dark Background</label>
+        <select class="form-select" id="modal-darkBg">
+          <option value="false">No</option>
+          <option value="true">Yes</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Image</label>
+        <div class="img-upload" id="modal-img-upload" onclick="document.getElementById('modal-img-input').click()">
+          <input type="file" id="modal-img-input" accept="image/*" onchange="handleImageUpload(event)">
+          <div class="img-upload-text" id="modal-img-text">
+            Click to upload or drag image here<br><strong>PNG, JPG</strong> up to 10MB
+          </div>
+        </div>
+        <input type="hidden" id="modal-image">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
+      <button class="btn btn-save" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+  <span id="toast-text">Saved successfully</span>
+</div>
+
+<script>
+let data = { site: {}, collections: [], products: [] };
+
+// ─── LOAD DATA ───
+async function loadData() {
+  try {
+    const res = await fetch('data.json?t=' + Date.now());
+    data = await res.json();
+  } catch (e) {
+    console.error('Could not load data.json', e);
+  }
+  renderAll();
+}
+
+function renderAll() {
+  renderStats();
+  renderProducts();
+  renderCollections();
+  renderSiteSettings();
+}
+
+// ─── STATS ───
+function renderStats() {
+  const total = data.products.length;
+  const available = data.products.filter(p => p.status === 'available').length;
+  const cols = data.collections.length;
+  const avgPrice = total ? (data.products.reduce((s, p) => s + p.price, 0) / total).toFixed(0) : 0;
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Products</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">Available</div><div class="stat-value">${available}</div><div class="stat-sub">${total - available} coming soon</div></div>
+    <div class="stat-card"><div class="stat-label">Collections</div><div class="stat-value">${cols}</div></div>
+    <div class="stat-card"><div class="stat-label">Avg. Price</div><div class="stat-value">${avgPrice} <span class="sar"></span></div></div>
+  `;
+}
+
+// ─── PRODUCTS TABLE ───
+function renderProducts() {
+  const tbody = document.getElementById('products-tbody');
+  tbody.innerHTML = data.products.map(p => {
+    const col = data.collections.find(c => c.id === p.collection);
+    const colName = col ? col.name : p.collection;
+    const statusClass = p.status === 'available' ? 'status-available' : 'status-coming-soon';
+    const statusText = p.status === 'available' ? 'Available' : 'Coming Soon';
+    return `<tr>
+      <td><div class="img-cell" style="${p.darkBg ? 'background:#0a0a0a' : ''}"><img src="${p.image}" alt=""></div></td>
+      <td style="font-weight:500;">${p.name}</td>
+      <td>${colName}</td>
+      <td>${p.price.toFixed(2)} <span class="sar"></span></td>
+      <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+      <td><div class="actions-cell">
+        <button class="btn-icon" onclick="editProduct('${p.id}')" title="Edit">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>
+        </button>
+        <button class="btn-icon delete" onclick="deleteProduct('${p.id}')" title="Delete">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+        </button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── COLLECTIONS ───
+function renderCollections() {
+  const list = document.getElementById('collections-list');
+  list.innerHTML = data.collections.map((c, i) => `
+    <div class="card">
+      <div class="card-title">${c.name} <span class="badge">${c.tag}</span></div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Name</label><input class="form-input" value="${c.name}" onchange="data.collections[${i}].name=this.value"></div>
+        <div class="form-group"><label class="form-label">Tag</label><input class="form-input" value="${c.tag}" onchange="data.collections[${i}].tag=this.value"></div>
+        <div class="form-group full"><label class="form-label">Description</label><textarea class="form-textarea" onchange="data.collections[${i}].desc=this.value">${c.desc}</textarea></div>
+        <div class="form-group"><label class="form-label">Banner Image</label><input class="form-input" value="${c.bannerImage}" onchange="data.collections[${i}].bannerImage=this.value"></div>
+        <div class="form-group"><label class="form-label">Style</label>
+          <select class="form-select" onchange="data.collections[${i}].bannerStyle=this.value">
+            <option value="dark" ${c.bannerStyle==='dark'?'selected':''}>Dark</option>
+            <option value="light" ${c.bannerStyle==='light'?'selected':''}>Light</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── SITE SETTINGS ───
+function renderSiteSettings() {
+  const s = data.site;
+  document.getElementById('site-heroTag').value = s.heroTag || '';
+  document.getElementById('site-heroTitle').value = (s.heroTitle || '').replace(/\n/g, '\\n');
+  document.getElementById('site-heroDesc').value = s.heroDesc || '';
+  document.getElementById('site-heroImage').value = s.heroImage || '';
+  document.getElementById('site-storyTitle').value = (s.storyTitle || '').replace(/\n/g, '\\n');
+  document.getElementById('site-storyP1').value = s.storyP1 || '';
+  document.getElementById('site-storyP2').value = s.storyP2 || '';
+  document.getElementById('site-newsletterTitle').value = s.newsletterTitle || '';
+  document.getElementById('site-newsletterDesc').value = s.newsletterDesc || '';
+}
+
+function collectSiteSettings() {
+  data.site.heroTag = document.getElementById('site-heroTag').value;
+  data.site.heroTitle = document.getElementById('site-heroTitle').value.replace(/\\n/g, '\n');
+  data.site.heroDesc = document.getElementById('site-heroDesc').value;
+  data.site.heroImage = document.getElementById('site-heroImage').value;
+  data.site.storyTitle = document.getElementById('site-storyTitle').value.replace(/\\n/g, '\n');
+  data.site.storyP1 = document.getElementById('site-storyP1').value;
+  data.site.storyP2 = document.getElementById('site-storyP2').value;
+  data.site.newsletterTitle = document.getElementById('site-newsletterTitle').value;
+  data.site.newsletterDesc = document.getElementById('site-newsletterDesc').value;
+}
+
+// ─── PRODUCT MODAL ───
+function openProductModal(id) {
+  const modal = document.getElementById('productModal');
+  const selCol = document.getElementById('modal-collection');
+  selCol.innerHTML = data.collections.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+  if (id) {
+    const p = data.products.find(x => x.id === id);
+    document.getElementById('modal-title-text').textContent = 'Edit Product';
+    document.getElementById('modal-product-id').value = p.id;
+    document.getElementById('modal-name').value = p.name;
+    document.getElementById('modal-collection').value = p.collection;
+    document.getElementById('modal-price').value = p.price;
+    document.getElementById('modal-status').value = p.status;
+    document.getElementById('modal-darkBg').value = String(p.darkBg);
+    document.getElementById('modal-image').value = p.image;
+    const upload = document.getElementById('modal-img-upload');
+    upload.classList.add('has-image');
+    upload.innerHTML = `<input type="file" id="modal-img-input" accept="image/*" onchange="handleImageUpload(event)"><img src="${p.image}" alt="">`;
+  } else {
+    document.getElementById('modal-title-text').textContent = 'Add Product';
+    document.getElementById('modal-product-id').value = '';
+    document.getElementById('modal-name').value = '';
+    document.getElementById('modal-price').value = '';
+    document.getElementById('modal-status').value = 'available';
+    document.getElementById('modal-darkBg').value = 'false';
+    document.getElementById('modal-image').value = '';
+    const upload = document.getElementById('modal-img-upload');
+    upload.classList.remove('has-image');
+    upload.innerHTML = `<input type="file" id="modal-img-input" accept="image/*" onchange="handleImageUpload(event)"><div class="img-upload-text" id="modal-img-text">Click to upload or drag image here<br><strong>PNG, JPG</strong> up to 10MB</div>`;
+  }
+  modal.classList.add('show');
+}
+
+function closeProductModal() {
+  document.getElementById('productModal').classList.remove('show');
+}
+
+function editProduct(id) { openProductModal(id); }
+
+function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  data.products = data.products.filter(p => p.id !== id);
+  renderAll();
+  showToast('Product deleted');
+}
+
+function saveProduct() {
+  const id = document.getElementById('modal-product-id').value;
+  const product = {
+    id: id || 'p' + Date.now(),
+    name: document.getElementById('modal-name').value,
+    collection: document.getElementById('modal-collection').value,
+    price: parseFloat(document.getElementById('modal-price').value) || 0,
+    status: document.getElementById('modal-status').value,
+    darkBg: document.getElementById('modal-darkBg').value === 'true',
+    image: document.getElementById('modal-image').value || 'images/placeholder.png'
+  };
+  if (id) {
+    const idx = data.products.findIndex(p => p.id === id);
+    if (idx !== -1) data.products[idx] = product;
+  } else {
+    data.products.push(product);
+  }
+  closeProductModal();
+  renderAll();
+  showToast(id ? 'Product updated' : 'Product added');
+}
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  // Save to images folder path
+  const fileName = 'images/' + file.name;
+  document.getElementById('modal-image').value = fileName;
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const upload = document.getElementById('modal-img-upload');
+    upload.classList.add('has-image');
+    const existingInput = upload.querySelector('input[type="file"]');
+    upload.innerHTML = '';
+    upload.appendChild(existingInput);
+    const img = document.createElement('img');
+    img.src = e.target.result;
+    upload.appendChild(img);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── SAVE ALL ───
+function saveAll() {
+  collectSiteSettings();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'data.json';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Data exported — replace data.json in your website folder');
+}
+
+function exportData() { saveAll(); }
+
+// ─── NAVIGATION ───
+function switchPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav li').forEach(l => l.classList.remove('active'));
+  const panel = document.getElementById('panel-' + name);
+  const navItem = document.querySelector('[data-panel="' + name + '"]');
+  if (panel) panel.classList.add('active');
+  if (navItem) navItem.classList.add('active');
+  if (name === 'passwords') renderTempPasswords();
+}
+document.querySelectorAll('.sidebar-nav li').forEach(li => {
+  li.addEventListener('click', () => switchPanel(li.dataset.panel));
+});
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── PASSWORD MANAGEMENT ───
+function changeMainPw() {
+  const pw = document.getElementById('new-main-pw').value;
+  const confirm = document.getElementById('confirm-main-pw').value;
+  if (!pw) return showToast('Enter a new password');
+  if (pw !== confirm) return showToast('Passwords do not match');
+  TAM_Auth.changeMainPassword(pw);
+  document.getElementById('new-main-pw').value = '';
+  document.getElementById('confirm-main-pw').value = '';
+  showToast('Main password updated');
+}
+
+function autoGenCode() {
+  document.getElementById('temp-code').value = TAM_Auth.generateRandomCode(6);
+}
+
+function createTempPw() {
+  const code = document.getElementById('temp-code').value.trim();
+  const label = document.getElementById('temp-label').value.trim() || 'Guest';
+  const hours = parseInt(document.getElementById('temp-hours').value) || null;
+  const uses = parseInt(document.getElementById('temp-uses').value) || null;
+  if (!code) return showToast('Enter a password code');
+  TAM_Auth.createTempPassword(code, label, hours, uses);
+  document.getElementById('temp-code').value = '';
+  document.getElementById('temp-label').value = '';
+  document.getElementById('temp-hours').value = '';
+  document.getElementById('temp-uses').value = '';
+  renderTempPasswords();
+  showToast('Temporary password created: ' + code);
+}
+
+function renderTempPasswords() {
+  const tbody = document.getElementById('temp-pw-tbody');
+  const empty = document.getElementById('temp-pw-empty');
+  const temps = TAM_Auth.getTempPasswords();
+
+  if (temps.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = temps.map((tp, i) => {
+    const now = Date.now();
+    let status = 'Active';
+    let statusClass = 'status-available';
+    if (!tp.active) { status = 'Disabled'; statusClass = 'status-coming-soon'; }
+    else if (tp.expiresAt && now > tp.expiresAt) { status = 'Expired'; statusClass = 'status-coming-soon'; }
+    else if (tp.maxUses && tp.usedCount >= tp.maxUses) { status = 'Used Up'; statusClass = 'status-coming-soon'; }
+
+    const uses = tp.maxUses ? `${tp.usedCount || 0} / ${tp.maxUses}` : `${tp.usedCount || 0} / ∞`;
+    const expires = tp.expiresAt ? new Date(tp.expiresAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : 'Never';
+
+    return `<tr>
+      <td><code style="background:var(--gray-100);padding:0.2rem 0.5rem;border-radius:4px;font-size:0.85rem;font-weight:600;letter-spacing:0.05em">${tp.code}</code></td>
+      <td>${tp.label}</td>
+      <td><span class="status-badge ${statusClass}">${status}</span></td>
+      <td>${uses}</td>
+      <td style="font-size:0.8rem;color:var(--gray-500)">${expires}</td>
+      <td><div class="actions-cell">
+        ${tp.active ? `<button class="btn-icon" onclick="deactivateTp(${i})" title="Deactivate">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+        </button>` : ''}
+        <button class="btn-icon delete" onclick="deleteTp(${i})" title="Delete">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+        </button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function deactivateTp(index) {
+  TAM_Auth.deactivateTempPassword(index);
+  renderTempPasswords();
+  showToast('Password deactivated');
+}
+
+function deleteTp(index) {
+  if (!confirm('Delete this temporary password?')) return;
+  TAM_Auth.deleteTempPassword(index);
+  renderTempPasswords();
+  showToast('Password deleted');
+}
+
+// ─── INIT ───
+loadData();
+</script>
+</body>
+</html>
